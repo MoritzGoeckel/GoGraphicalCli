@@ -65,11 +65,15 @@ func runDrawingLoop(width int, height int) {
 		for y := 0; y < height; y++ {
 			for x := 0; x < width; x++ {
 				pixel := frame[y][x]
+				//if pixel == nil {
+				//	fmt.Print(string(Black) + string(Block) + "\033[0m")
+				//} else {
 				fmt.Print(string(pixel.color) + string(pixel.char) + "\033[0m")
+				//}
 			}
 			fmt.Print("\r\n")
 		}
-		time.Sleep(80 * time.Millisecond)
+		time.Sleep(120 * time.Millisecond)
 	}
 }
 
@@ -77,7 +81,7 @@ func runUpdateLoop() {
 	for {
 		doUpdate(100, pressedKeys)
 		pressedKeys = ""
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(120 * time.Millisecond)
 	}
 }
 
@@ -99,10 +103,25 @@ func quit() {
 	end = true
 }
 
-var isw = false
+var px = 5
+var py = 29
 
 func doUpdate(eTime int, pressedKeys string) {
-	isw = strings.ContainsRune(pressedKeys, 'w')
+	if py == 28 {
+		py = 29
+	}
+
+	if strings.ContainsRune(pressedKeys, 'd') {
+		px++
+	}
+
+	if strings.ContainsRune(pressedKeys, 'a') {
+		px--
+	}
+
+	if strings.ContainsRune(pressedKeys, ' ') {
+		py--
+	}
 }
 
 func draw(width int, height int) [][]Pixel {
@@ -110,12 +129,15 @@ func draw(width int, height int) [][]Pixel {
 	for y := 0; y < height; y++ {
 		frame[y] = make([]Pixel, width)
 		for x := 0; x < width; x++ {
-			color := Green
-			if x%2+y%2 == 0 || isw {
-				color = Red
+			if y == 30 {
+				frame[y][x] = Pixel{Green, Block}
+			} else {
+				frame[y][x] = Pixel{Black, Block}
 			}
-			frame[y][x] = Pixel{color, Block}
 		}
 	}
+
+	frame[py][px] = Pixel{Green, Block}
+
 	return frame
 }
